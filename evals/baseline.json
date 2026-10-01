@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-01",
+  "embeddingProvider": "ollama",
+  "embeddingModel": "nomic-embed-text",
+  "caseCount": 30,
+  "retrievalAccuracy": 1,
+  "correctRefusalRate": 1
+}
