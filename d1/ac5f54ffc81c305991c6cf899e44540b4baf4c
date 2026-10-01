@@ -1,0 +1,31 @@
+evals/cases.ts
+  s_f0c6a093b18fbc::t_99fb6eda7ff11c 1-100
+  s_f0c6a093b18fbc::t_e0266c32d4e584 101-110
+PLAN.md
+  s_f0c6a093b18fbc::t_0dc77665c5eeea 39-46
+evals/baseline.json
+  s_f0c6a093b18fbc::t_a0453392a02169 1,3-8
+  s_f0c6a093b18fbc::t_ad3230dbceee18 2
+evals/results.md
+  s_f0c6a093b18fbc::t_a0453392a02169 1-4,6-21
+  s_f0c6a093b18fbc::t_ad3230dbceee18 5
+evals/run-eval.ts
+  s_f0c6a093b18fbc::t_6015b3d5f06059 1-116
+  s_f0c6a093b18fbc::t_339ea5b3fc2883 117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d1ac5f54ffc81c305991c6cf899e44540b4baf4c",
+  "prompts": {},
+  "sessions": {
+    "s_f0c6a093b18fbc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf59d10-8ac1-40c5-8e78-59b7400789f3",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
