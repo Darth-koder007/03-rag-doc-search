@@ -1,0 +1,29 @@
+src/cli.ts
+  s_f0c6a093b18fbc::t_34f868da7da6b2 1-47
+src/retrieve.test.ts
+  s_f0c6a093b18fbc::t_45b71f20efb1ba 11-14,16
+  s_f0c6a093b18fbc::t_6d1f5e9b66dde3 56-73
+PLAN.md
+  s_f0c6a093b18fbc::t_a3232ff3e93995 48,50-52
+src/retrieve.ts
+  s_f0c6a093b18fbc::t_91f1d7f9662401 25-30
+  s_f0c6a093b18fbc::t_faf2dee0f07822 31-33
+.gitignore
+  s_f0c6a093b18fbc::t_71f68bdc513dc5 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "a87f78c677e1911bcdfab165d71522fb53823519",
+  "prompts": {},
+  "sessions": {
+    "s_f0c6a093b18fbc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf59d10-8ac1-40c5-8e78-59b7400789f3",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
