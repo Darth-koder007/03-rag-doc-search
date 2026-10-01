@@ -1,0 +1,13 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      # 11437 — distinct from Project 1's 11435, Project 2's 11436, and the OS default 11434
+      # (which may already be a native install), so every portfolio project's Ollama container
+      # can run side by side without colliding.
+      - "11437:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  ollama_data:
