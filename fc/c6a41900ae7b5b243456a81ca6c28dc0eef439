@@ -1,0 +1,20 @@
+README.md
+  s_f0c6a093b18fbc::t_cbc03101c9e93b 87,101,109,126
+  s_f0c6a093b18fbc::t_72f79e7c303367 79,84-86,95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "fcc6a41900ae7b5b243456a81ca6c28dc0eef439",
+  "prompts": {},
+  "sessions": {
+    "s_f0c6a093b18fbc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf59d10-8ac1-40c5-8e78-59b7400789f3",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
