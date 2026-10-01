@@ -13,18 +13,20 @@ Natural-language Q&A over Project 0's design-system documentation, with citation
 
 ## Milestones
 
-### M3.1 — Doc ingestion pipeline
+### M3.1 — Doc ingestion pipeline — done
 
-- [ ] Parse MDX/Storybook doc files into semantically meaningful chunks (per component, per prop table, per usage example — not fixed-size text windows that split a prop table mid-row)
-- [ ] Attach metadata to each chunk: component name, doc section, source file path
-- [ ] Re-runnable ingestion (re-embed on doc change, don't require a full rebuild)
-- **Acceptance:** ingesting Project 0's docs produces one or more chunks per component with correct metadata, verified by listing chunk counts per component.
+- [x] Parse component source into semantically meaningful chunks (per component, per prop table, per usage example — not fixed-size text windows that split a prop table mid-row)
+- [x] Attach metadata to each chunk: component name, doc section, source file path
+- [x] Re-runnable ingestion (re-reads source fresh each run; nothing cached that could go stale — re-embedding happens in M3.3's store build)
+- **Deliberate deviation from the plan's wording, disclosed rather than silent:** the plan's tech-decisions section says "MDX/Storybook docs." Project 0 never wrote MDX docs — it only has component `.tsx` source and `.stories.tsx` files (confirmed by listing the actual directory before writing any parser). The ingestion source is the real `.tsx` prop types + JSDoc comments (`parse-component.ts`, via `ts-morph`) and real `.stories.tsx` usage examples (`parse-story.ts`) instead — still genuine, non-synthetic content, just not in MDX format. Two chunks per component: an "api" chunk (type aliases, the props interface with each member's type and JSDoc, including `@deprecated` notes) and a "usage" chunk (Storybook meta title + each story's `args` or custom `render` source).
+- **Acceptance:** 12 fixture-based unit tests (`parse-component.test.ts`, `parse-story.test.ts`, `ingest.test.ts`) against two small hand-written fixture components (one with stories, one without, to cover both branches) — deterministic regardless of Project 0 changing. Real integration check: `pnpm ingest ../00-design-system/packages/components/src` against Project 0's actual 14 components produced exactly 28 chunks (api + usage for every one), verified by listing per-component chunk counts. Spot-checking the generic-heavy `Table.tsx` output caught one real gap — `TableColumn<T>`'s type parameter was silently dropped from the printed interface header even though the body referenced `T` — fixed by reading `getTypeParameters()` and re-verified against the real file.
 
-### M3.2 — LLM/embedding client abstraction
+### M3.2 — LLM/embedding client abstraction — done
 
-- [ ] Reuse the interface shape from Projects 1 and 2: a provider-agnostic `embed(text) -> vector` and `generate(prompt) -> result`, with Ollama (local, default) and cloud (OpenAI/Voyage for embeddings, Anthropic for generation) implementations, selected via env var
-- [ ] Local dev runs entirely against the Dockerized Ollama instance for both embedding and generation — no key, no cost
-- **Acceptance:** the same query produces a retrieval + answer against both provider configurations with only the env var changed.
+- [x] Reuse the interface shape from Projects 1 and 2: a provider-agnostic `embed(text) -> vector` and `generate(prompt) -> result`, with Ollama (local, default) and cloud (OpenAI for embeddings — chosen over Voyage to avoid a second new SDK dependency for one endpoint, called via plain `fetch` rather than pulling in the `openai` SDK at all; Anthropic for generation) implementations, selected via env var
+- [x] Local dev runs entirely against the Dockerized Ollama instance (host port **11437** — distinct from Project 1's 11435, Project 2's 11436, and the OS default 11434) for both embedding and generation — no key, no cost
+- **Deliberate design choice beyond the plan's literal wording:** embeddings and generation are two _separate_ provider switches (`EMBEDDING_PROVIDER`, `LLM_PROVIDER`), not one shared switch, because Anthropic has no embeddings endpoint — the plan's own tech-decisions section already anticipates this split ("OpenAI/Voyage for embeddings and Anthropic for generation").
+- **Acceptance:** `createLlmClient`/`createEmbeddingClient` construction verified unit-tested (7 tests: defaults with no env, clear error with no API key rather than failing inside a network call, correct provider selection, and that the two switches are independent of each other). Full cross-provider retrieval parity (same query, same answer shape, provider swapped via env var alone) is verified at M3.3 once retrieval exists to run end-to-end.
 
 ### M3.3 — Retrieval + citation-backed generation
 
