@@ -76,33 +76,29 @@ This is demonstrated in the usage example for the `Dropdown` component in excerp
     { value: "delete", label: "Delete", disabled: true, onSelect: () => {} },
   ]}
 />
-````
+```
 
 In this example, the "Delete" item is disabled, meaning it cannot be selected.
 
 Sources:
-
-- Dropdown (api) — ../00-design-system/packages/components/src/Dropdown.tsx
-- Dropdown (usage) — ../00-design-system/packages/components/src/Dropdown.stories.tsx
-- Select (api) — ../00-design-system/packages/components/src/Select.tsx
-
-```
+  - Dropdown (api) — ../00-design-system/packages/components/src/Dropdown.tsx
+  - Dropdown (usage) — ../00-design-system/packages/components/src/Dropdown.stories.tsx
+  - Select (api) — ../00-design-system/packages/components/src/Select.tsx
+````
 
 **A question with no answer here — the honesty path, not a guess:**
 
 ```
-
 $ docsearch ask "How do I set up OAuth2 login?"
 
 I don't have documentation for that in this design system. Try rephrasing, or it may genuinely not exist here.
-
-````
+```
 
 ## Design decisions
 
 **Chunking: per-component, not fixed-size.** Project 0 never wrote MDX docs — only `.tsx` component source and `.stories.tsx` story files. Rather than treat that as a blocker, ingestion parses the real prop types/JSDoc (`parse-component.ts`, via `ts-morph`) into an "api" chunk and the real Storybook usage examples (`parse-story.ts`) into a "usage" chunk, one of each per component. This is still genuine, non-synthetic content — just not in the MDX format the plan originally assumed, confirmed by checking the actual directory before writing any parser. A fixed-size window chunker would risk splitting a prop table mid-row or merging two unrelated components into one chunk; verified this concretely (see Real limitations) rather than just asserting it.
 
-**Confidence threshold tuned against real data.** `DEFAULT_CONFIDENCE_THRESHOLD = 0.5` wasn't guessed — it was set after embedding 11 real queries (8 in-scope, 3 out-of-scope) against the real store and finding a clean gap: in-scope top-1 cosine similarity ranged 0.586–0.737, out-of-scope ranged 0.366–0.450. The threshold sits in the middle of that gap. The honesty path triggers *before* any LLM call, not as a post-hoc check on the model's answer — the same shape as Project 1's deterministic rule-engine fallback.
+**Confidence threshold tuned against real data.** `DEFAULT_CONFIDENCE_THRESHOLD = 0.5` wasn't guessed — it was set after embedding 11 real queries (8 in-scope, 3 out-of-scope) against the real store and finding a clean gap: in-scope top-1 cosine similarity ranged 0.586–0.737, out-of-scope ranged 0.366–0.450. The threshold sits in the middle of that gap. The honesty path triggers _before_ any LLM call, not as a post-hoc check on the model's answer — the same shape as Project 1's deterministic rule-engine fallback.
 
 **Brute-force vector search, not an ANN index.** The plan's own tech-decisions section asks for something self-hostable with zero infra cost, not necessarily an indexed vector database. This corpus is ~28 chunks — one design system's worth of components. A `sqlite-vec` or FAISS index would solve a million-row scale problem this project doesn't have, at the cost of a native dependency that risks failing to install in CI. Cosine similarity over a plain array is exact, has zero extra dependencies, and runs in milliseconds at this scale.
 
@@ -110,7 +106,7 @@ I don't have documentation for that in this design system. Try rephrasing, or it
 
 ## Real limitations found while building this (not hidden)
 
-- **The 100% eval score measures "is the right component in the top-3," not "does retrieval survive bad chunking."** A deliberate stress test makes this concrete: truncating each real chunk to 60 characters (keeping its own `Component: X` header, losing almost all prop detail) *still* scored 100% — the embedding model picks up enough signal from the component's own name to rank correctly regardless of how much actual content survived. The eval only caught a real regression once chunking was broken in a way that's actually representative of the stated risk — a genuinely naive fixed-400-character-window chunker that ignores file boundaries entirely, producing windows that start partway through one component and bleed into the next. That scored **87.5% (21/24)**, a real 12.5-point drop. Both experiments are in `PLAN.md`'s M3.6 entry. The honest takeaway: this eval set is good at catching a broken chunking *architecture*, not necessarily a chunking *degradation* within an architecture that still respects component boundaries.
+- **The 100% eval score measures "is the right component in the top-3," not "does retrieval survive bad chunking."** A deliberate stress test makes this concrete: truncating each real chunk to 60 characters (keeping its own `Component: X` header, losing almost all prop detail) _still_ scored 100% — the embedding model picks up enough signal from the component's own name to rank correctly regardless of how much actual content survived. The eval only caught a real regression once chunking was broken in a way that's actually representative of the stated risk — a genuinely naive fixed-400-character-window chunker that ignores file boundaries entirely, producing windows that start partway through one component and bleed into the next. That scored **87.5% (21/24)**, a real 12.5-point drop. Both experiments are in `PLAN.md`'s M3.6 entry. The honest takeaway: this eval set is good at catching a broken chunking _architecture_, not necessarily a chunking _degradation_ within an architecture that still respects component boundaries.
 - **Correct-refusal is genuinely easier here than in Projects 1/2.** Embeddings are deterministic, so there's no LLM-sampling noise in the scored path at all — a stark contrast with Project 2's Tier 2, where the same adversarial case could pass or fail across repeated runs purely from model sampling. That's a property of this architecture (retrieval doesn't generate text), not evidence this system is more "correct" in some deeper sense.
 - **Cross-provider parity (OpenAI embeddings, Anthropic generation) is structurally supported but not live-verified.** Both are wired through the same env-var-selected interfaces as Ollama; neither has been run for real, for lack of an API key.
 - **A real bug found while building the CLI, not just the library:** nothing originally stopped `docsearch ask` from querying a vector store built with a different embedding provider/model than the one currently configured — cosine similarity across two different embedding spaces is meaningless, but nothing surfaced that as anything other than a wrong answer. Fixed with an explicit check in `retrieve()` that throws a clear, specific error instead of silently comparing incomparable vectors.
@@ -127,7 +123,7 @@ pnpm build
 node dist/cli.js build ../00-design-system/packages/components/src
 node dist/cli.js ask "<question>"
 pnpm eval                                                    # regenerate evals/results.md
-````
+```
 
 ## Status
 
