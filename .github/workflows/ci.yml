@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  eval:
+    runs-on: ubuntu-latest
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: rag-doc-search
+
+      # Ingestion reads Project 0's component source as plain text/AST (ts-morph, syntax only) —
+      # it never builds or imports @ds/components, so checking out the source is enough; unlike
+      # Project 1, there's no `pnpm build` step needed here.
+      - name: Checkout design system (ingestion source)
+        uses: actions/checkout@v4
+        with:
+          repository: Darth-koder007/00-design-system
+          path: 00-design-system
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: rag-doc-search/pnpm-lock.yaml
+
+      - name: Pull the embedding + generation models
+        run: |
+          curl -s http://localhost:11434/api/pull -d '{"model":"nomic-embed-text"}'
+          curl -s http://localhost:11434/api/pull -d '{"model":"llama3.2:3b"}'
+
+      - name: Run the eval regression gate against Ollama
+        working-directory: rag-doc-search
+        env:
+          OLLAMA_BASE_URL: http://localhost:11434
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm eval:check
