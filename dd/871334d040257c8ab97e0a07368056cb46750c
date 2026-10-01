@@ -1,0 +1,61 @@
+tsconfig.build.json
+  s_f0c6a093b18fbc::t_f423434c9c9935 1-10
+src/llm/types.ts
+  s_f0c6a093b18fbc::t_65b23021d257e2 1-16
+src/embeddings/create-embedding-client.ts
+  s_f0c6a093b18fbc::t_404a6edc4a560b 1-41
+.gitignore
+  s_f0c6a093b18fbc::t_046513220a2494 1-5
+docker-compose.yml
+  s_f0c6a093b18fbc::t_be5a60cf231694 1-13
+src/llm/anthropic-client.ts
+  s_f0c6a093b18fbc::t_fabce1fcaefe01 1-29
+src/llm/ollama-client.ts
+  s_f0c6a093b18fbc::t_1d56cb5b1da845 1-36
+src/embeddings/openai-embedding-client.ts
+  s_f0c6a093b18fbc::t_4ea2ba41ea58ec 1-45
+  s_f0c6a093b18fbc::t_80f7d83157b7bf 46-47
+tsconfig.json
+  s_f0c6a093b18fbc::t_9e859ba59b2528 1-16,18
+  s_f0c6a093b18fbc::t_3713a91fbe2f92 17
+.prettierrc
+  s_f0c6a093b18fbc::t_35f13c2cc3808f 1-6
+src/llm/create-client.test.ts
+  s_f0c6a093b18fbc::t_fa8ec56dc6b408 1-20
+src/embeddings/ollama-embedding-client.ts
+  s_f0c6a093b18fbc::t_54ca181349d925 1-37
+src/llm/create-client.ts
+  s_f0c6a093b18fbc::t_e02dc62af74250 1-40
+vitest.config.ts
+  s_f0c6a093b18fbc::t_153eeae913d74e 1-8
+.husky/pre-commit
+  s_f0c6a093b18fbc::t_16a00dfb44c97f 1
+src/embeddings/types.ts
+  s_f0c6a093b18fbc::t_d4b9b24b613618 1-7
+src/embeddings/create-embedding-client.test.ts
+  s_f0c6a093b18fbc::t_6ce815e67dd31b 1-26
+eslint.config.js
+  s_f0c6a093b18fbc::t_659cdb17593a94 1-21
+package.json
+  s_f0c6a093b18fbc::t_373fb45662c624 1-55
+PLAN.md
+  s_f0c6a093b18fbc::t_c009c28049f8a6 1-68
+pnpm-lock.yaml
+  s_f0c6a093b18fbc::t_2d8e9d86daea08 1-2849
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "dd871334d040257c8ab97e0a07368056cb46750c",
+  "prompts": {},
+  "sessions": {
+    "s_f0c6a093b18fbc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdf59d10-8ac1-40c5-8e78-59b7400789f3",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
