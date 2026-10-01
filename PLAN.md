@@ -57,12 +57,13 @@ Natural-language Q&A over Project 0's design-system documentation, with citation
 - [x] Unit tests for chunking (`parse-component.test.ts`, `parse-story.test.ts`, `ingest.test.ts` from M3.1) are independent of any LLM call — confirmed by inspection, these only invoke `ts-morph` parsing against fixture files
 - **Acceptance, verified locally since real CI is blocked on GitHub push:** deliberately built a genuinely naive chunker — concatenate every component file's raw source in file order, split into fixed 400-character windows with no regard for file boundaries (the actual failure mode M3.1 names: "not fixed-size text windows that split a prop table mid-row"), label each window by whichever component it _starts_ in. This produced 142 windows (vs. the real chunker's 28) and **87.5% retrieval accuracy (21/24)** against the exact same 24 in-scope eval questions — a real 12.5-point drop from the committed 100.0% baseline, which `eval:check`'s zero-tolerance gate would correctly fail on. This is a stronger result than an earlier attempt (truncating each real chunk to 60 characters while keeping its own component-name header) which surprisingly still scored 100% — short of it, the embedding model picks up enough signal from just the component name to rank correctly, which is itself a real, disclosed limitation of this specific eval's discriminating power (see README's limitations section): it mostly proves component names are present and distinguishable, not that full prop-table content survives intact. The cross-boundary naive-window version is the one that actually stresses that.
 
-### M3.7 — README + demo
+### M3.7 — README + demo — done
 
-- [ ] Lead with the eval number, not just "it works" — a measured accuracy is a credibility signal recruiters and interviewers actually notice
-- [ ] Architecture diagram: docs → chunk → embed → store; query → embed → retrieve → cite → answer
-- [ ] Recorded demo including at least one "no documentation found" case to show the honesty path isn't decorative
-- [ ] "Design decisions" section: chunking strategy and why, confidence threshold choice and how it was tuned, why the tool works with no API key via Ollama
+- [x] Lead with the eval number, not just "it works" — a measured accuracy is a credibility signal recruiters and interviewers actually notice
+- [x] Architecture diagram: docs → chunk → embed → store; query → embed → retrieve → cite → answer
+- [x] Recorded demo including at least one "no documentation found" case to show the honesty path isn't decorative
+- [x] "Design decisions" section: chunking strategy and why, confidence threshold choice and how it was tuned, why the tool works with no API key via Ollama
+- **Acceptance:** 3 real captured CLI transcripts (not staged) — `docsearch build` against the real 14-component design system, a real question with a grounded answer and real citations, and a genuinely unanswerable question returning the honesty message. The README's limitations section states the M3.6 eval-sensitivity finding plainly (100% is "right component ranks in top-3," not "chunking degradation is always caught") rather than only reporting the clean 100%/100% headline numbers.
 
 ### M3.8 — Flip repo to public
 
