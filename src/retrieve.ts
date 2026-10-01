@@ -22,6 +22,15 @@ export async function retrieve(
   k = 3,
   threshold = DEFAULT_CONFIDENCE_THRESHOLD
 ): Promise<RetrievalResult> {
+  if (
+    store.entries.length > 0 &&
+    (store.provider !== embeddingClient.provider || store.model !== embeddingClient.model)
+  ) {
+    throw new Error(
+      `Vector store was built with ${store.provider}:${store.model}, but retrieval is using ${embeddingClient.provider}:${embeddingClient.model}. Cosine similarity across two different embedding spaces is meaningless — rebuild the store with the embedding client you intend to query with.`
+    );
+  }
+
   const queryVector = await embeddingClient.embed(query);
   const matches = searchVectorStore(store, queryVector, k);
   const confident = matches.length > 0 && matches[0]!.score >= threshold;

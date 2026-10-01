@@ -45,10 +45,11 @@ Natural-language Q&A over Project 0's design-system documentation, with citation
 - **A genuinely different reproducibility story than Projects 1/2:** this eval's scored path is retrieval only — embed the question, compare cosine similarity — with no LLM `generate()` call at all. Embeddings are deterministic (confirmed in M3.3). Verified by running `pnpm eval` twice with no code change: every field except the date stamp was byte-identical. `eval:check` therefore uses **zero** regression tolerance, not a 10% band like Projects 1/2 needed for generation-sampling noise — a drop here means something real changed (chunking, threshold, questions), not randomness.
 - **Acceptance:** live run against the real design system and real Ollama: **100.0% retrieval accuracy** (24/24), **100.0% correct-refusal rate** (6/6). `eval:check` passes cleanly against its own freshly-written baseline. `evals/results.md` includes a per-question pass/fail breakdown (empty in this run since there were no failures to list).
 
-### M3.5 — Minimal UI or CLI
+### M3.5 — Minimal UI or CLI — done
 
-- [ ] A simple chat-style interface (CLI is fine, a one-page web UI is nicer for a recorded demo) — question in, cited answer out
-- **Acceptance:** a cold demo viewer can ask a question and see both the answer and which doc it came from.
+- [x] CLI with two commands: `docsearch build <docsRoot>` (ingest + embed + save a vector store to disk) and `docsearch ask "<question>"` (load the store, retrieve, answer, print citations) — question in, cited answer out
+- **Real gap found and fixed before this was demo-safe:** nothing originally stopped `ask` from loading a store built with one embedding provider/model and querying it with a different one — cosine similarity across two different embedding spaces is meaningless, but nothing would have surfaced that as anything other than a wrong answer. Added a check in `retrieve()` that throws a clear, specific error (naming both the store's and the query's provider/model) rather than silently returning garbage; covered by a dedicated unit test.
+- **Acceptance:** live run against the real design system and real Ollama. `docsearch build ../00-design-system/packages/components/src` produced a real 28-entry store. `docsearch ask "How do I show a danger-toned button for a destructive action?"` returned a correct, grounded answer (citing `Button`'s real `tone="danger"`) with real source citations. `docsearch ask "How do I set up a Kubernetes ingress?"` returned the honesty message, not a hallucinated answer.
 
 ### M3.6 — Regression-checked test suite
 

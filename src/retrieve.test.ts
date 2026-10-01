@@ -8,10 +8,12 @@ function fakeChunk(componentName: string, text: string): Chunk {
   return { id: `${componentName}:api`, componentName, section: "api", sourceFile: "x.tsx", text };
 }
 
-function fakeEmbeddingClient(vectors: Record<string, number[]>): EmbeddingClient {
+function fakeEmbeddingClient(
+  vectors: Record<string, number[]>,
+  identity: { provider: string; model: string } = { provider: "fake", model: "fake-model" }
+): EmbeddingClient {
   return {
-    provider: "fake",
-    model: "fake-model",
+    ...identity,
     async embed(text: string) {
       const vector = vectors[text];
       if (!vector) throw new Error(`No fake vector configured for: ${text}`);
@@ -50,5 +52,23 @@ describe("retrieve", () => {
 
     expect(result.confident).toBe(false);
     expect(result.matches).toHaveLength(0);
+  });
+
+  it("throws a clear error when the query embedding client doesn't match the store's, rather than silently comparing incomparable vectors", async () => {
+    const chunks = [fakeChunk("Button", "button text")];
+    const buildClient = fakeEmbeddingClient(
+      { "button text": [1, 0] },
+      { provider: "ollama", model: "nomic-embed-text" }
+    );
+    const store = await buildVectorStore(chunks, buildClient);
+
+    const queryClient = fakeEmbeddingClient(
+      { "how do I click": [1, 0] },
+      { provider: "openai", model: "text-embedding-3-small" }
+    );
+
+    await expect(retrieve("how do I click", store, queryClient, 3, 0.5)).rejects.toThrow(
+      /was built with ollama:nomic-embed-text.*using openai:text-embedding-3-small/s
+    );
   });
 });
