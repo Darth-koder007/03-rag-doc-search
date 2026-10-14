@@ -4,3 +4,12 @@ dist/
 .DS_Store
 .env
 .docsearch-store.json
+.env.*
+!.env.example
+*.pem
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+*.auto.tfvars
+crash.log

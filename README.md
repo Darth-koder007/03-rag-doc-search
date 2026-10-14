@@ -136,8 +136,9 @@ export OLLAMA_BASE_URL=http://localhost:11437 DATABASE_URL=postgres://postgres:d
 node dist/cli.js build ../00-design-system/packages/components/src
 node dist/cli.js publish                      # replaces the Postgres index in one transaction
 
-API_TOKEN=dev-token docker compose --profile api up -d api
-curl -s localhost:8080/ask -H 'authorization: Bearer dev-token' -H 'content-type: application/json' \
+export API_TOKEN="$(openssl rand -hex 24)"
+docker compose --profile api up -d api
+curl -s localhost:8080/ask -H "authorization: Bearer $API_TOKEN" -H 'content-type: application/json' \
   -d '{"question":"What props does the Button component accept?"}'
 ```
 
