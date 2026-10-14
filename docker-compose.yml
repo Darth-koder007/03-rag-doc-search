@@ -1,4 +1,35 @@
 services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_PASSWORD: docsearch
+      POSTGRES_DB: docsearch
+    ports:
+      # 54330 — avoids a native Postgres on 5432 and the integration-test container on 54329.
+      - "54330:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d docsearch"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  api:
+    build: .
+    profiles: ["api"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:docsearch@postgres:5432/docsearch
+      API_TOKEN: ${API_TOKEN:-dev-token}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-ollama}
+      OLLAMA_BASE_URL: http://host.docker.internal:11437
+    ports:
+      - "8080:8080"
+
   ollama:
     image: ollama/ollama:latest
     ports:
@@ -11,3 +42,4 @@ services:
 
 volumes:
   ollama_data:
+  postgres_data:

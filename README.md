@@ -125,6 +125,38 @@ node dist/cli.js ask "<question>"
 pnpm eval                                                    # regenerate evals/results.md
 ```
 
+## Running it as an HTTP service
+
+The same retrieval path is served over HTTP, backed by Postgres + pgvector instead of a JSON file. Design and failure modes are in [`docs/design-http-service.md`](docs/design-http-service.md).
+
+```bash
+docker compose up -d postgres ollama
+export OLLAMA_BASE_URL=http://localhost:11437 DATABASE_URL=postgres://postgres:docsearch@127.0.0.1:54330/docsearch
+
+node dist/cli.js build ../00-design-system/packages/components/src
+node dist/cli.js publish                      # replaces the Postgres index in one transaction
+
+API_TOKEN=dev-token docker compose --profile api up -d api
+curl -s localhost:8080/ask -H 'authorization: Bearer dev-token' -H 'content-type: application/json' \
+  -d '{"question":"What props does the Button component accept?"}'
+```
+
+| Route                        | Auth   | Behaviour                                                                                    |
+| ---------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| `GET /healthz`               | none   | 200 with the index's embedding identity; 503 if Postgres is unreachable                      |
+| `POST /search` `{query, k?}` | bearer | ranked matches with cosine scores, no LLM call                                               |
+| `POST /ask` `{question}`     | bearer | grounded answer with citations, or the fixed no-documentation answer without calling the LLM |
+
+Verified against the real corpus (28 chunks, `nomic-embed-text`, `llama3.2:3b`) in the container: an in-scope Button question returned a grounded answer citing `Button.tsx`, an out-of-scope Kubernetes question returned `grounded: false` with no LLM call, and a missing token returned 401. `pnpm eval:check` is unchanged at 100% retrieval accuracy and 100% correct refusal, because the evals still run against the in-memory store.
+
+Limitations of this layer, as shipped:
+
+- **Auth is one static bearer token.** No accounts, rotation or per-caller limits yet.
+- **The confidence threshold is per embedding model.** `CONFIDENCE_THRESHOLD` overrides the default of 0.5, which was tuned for `nomic-embed-text`. Switching the embedding model requires re-publishing the index and re-tuning the threshold against that model's score distribution.
+- **Citations expose the ingestion-time source path** (for example `../00-design-system/packages/components/src/Button.tsx`), not a repository-relative path.
+- **The HTTP integration test uses a hashed bag-of-words embedder**, not a real model, so it needs no model download; Postgres, the HTTP server and ingestion are real. Retrieval quality is measured by the eval, not by this test.
+- **Not deployed anywhere yet.** That is the next milestone in the portfolio's deployment plan.
+
 ## Status
 
-Everything above is verified locally and live against real Ollama — see `PLAN.md` for the milestone-by-milestone account, including every real gap this process found and fixed. What's pending is external: pushing this repo to GitHub (for the CI workflow to run for real and for the repo to go public) and API keys for OpenAI/Anthropic (to publish those baselines alongside Ollama's) both need account access this assistant doesn't have.
+The CLI, the eval harness and the HTTP service are verified locally against real Ollama and a real pgvector container; CI runs the unit tests, the Postgres integration test, the image build and the eval regression gate.

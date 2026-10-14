@@ -1,4 +1,4 @@
-import { searchVectorStore, type VectorStore } from "./store/vector-store.js";
+import { asVectorIndex, type VectorIndex, type VectorStore } from "./store/vector-store.js";
 import type { EmbeddingClient } from "./embeddings/types.js";
 import type { Chunk } from "./types.js";
 
@@ -17,22 +17,23 @@ export const DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
 
 export async function retrieve(
   query: string,
-  store: VectorStore,
+  source: VectorStore | VectorIndex,
   embeddingClient: EmbeddingClient,
   k = 3,
   threshold = DEFAULT_CONFIDENCE_THRESHOLD
 ): Promise<RetrievalResult> {
+  const index = asVectorIndex(source);
   if (
-    store.entries.length > 0 &&
-    (store.provider !== embeddingClient.provider || store.model !== embeddingClient.model)
+    index.size > 0 &&
+    (index.provider !== embeddingClient.provider || index.model !== embeddingClient.model)
   ) {
     throw new Error(
-      `Vector store was built with ${store.provider}:${store.model}, but retrieval is using ${embeddingClient.provider}:${embeddingClient.model}. Cosine similarity across two different embedding spaces is meaningless — rebuild the store with the embedding client you intend to query with.`
+      `Vector store was built with ${index.provider}:${index.model}, but retrieval is using ${embeddingClient.provider}:${embeddingClient.model}. Cosine similarity across two different embedding spaces is meaningless — rebuild the store with the embedding client you intend to query with.`
     );
   }
 
   const queryVector = await embeddingClient.embed(query);
-  const matches = searchVectorStore(store, queryVector, k);
+  const matches = await index.search(queryVector, k);
   const confident = matches.length > 0 && matches[0]!.score >= threshold;
   return { confident, matches };
 }

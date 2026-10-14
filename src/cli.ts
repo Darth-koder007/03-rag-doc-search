@@ -5,6 +5,8 @@ import { createEmbeddingClient } from "./embeddings/create-embedding-client.js";
 import { createLlmClient } from "./llm/create-client.js";
 import { buildVectorStore, loadVectorStore, saveVectorStore } from "./store/vector-store.js";
 import { answerQuestion } from "./answer.js";
+import pg from "pg";
+import { publishVectorStore } from "./store/pg-vector-index.js";
 
 const DEFAULT_STORE_PATH = ".docsearch-store.json";
 
@@ -22,6 +24,27 @@ program
     const store = await buildVectorStore(chunks, embeddingClient);
     saveVectorStore(store, options.out);
     console.log(`Saved vector store to ${options.out} (${store.entries.length} entries).`);
+  });
+
+program
+  .command("publish")
+  .description("Write a built vector store into Postgres (pgvector), replacing the current index")
+  .option("--store <path>", "path to a built vector store", DEFAULT_STORE_PATH)
+  .action(async (options: { store: string }) => {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL must be set to publish an index.");
+    }
+    const store = loadVectorStore(options.store);
+    const pool = new pg.Pool({ connectionString });
+    try {
+      await publishVectorStore(pool, store);
+      console.log(
+        `Published ${store.entries.length} entries (${store.provider}:${store.model}) to Postgres.`
+      );
+    } finally {
+      await pool.end();
+    }
   });
 
 program
