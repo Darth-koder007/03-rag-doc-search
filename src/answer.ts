@@ -1,5 +1,5 @@
 import { retrieve, DEFAULT_CONFIDENCE_THRESHOLD } from "./retrieve.js";
-import type { VectorStore } from "./store/vector-store.js";
+import type { VectorIndex, VectorStore } from "./store/vector-store.js";
 import type { EmbeddingClient } from "./embeddings/types.js";
 import type { LlmClient } from "./llm/types.js";
 import type { ChunkSection } from "./types.js";
@@ -43,7 +43,7 @@ function buildPrompt(
  */
 export async function answerQuestion(
   query: string,
-  store: VectorStore,
+  store: VectorStore | VectorIndex,
   embeddingClient: EmbeddingClient,
   llmClient: LlmClient,
   k = 3,

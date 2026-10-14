@@ -63,6 +63,33 @@ export function searchVectorStore(
     .slice(0, k);
 }
 
+/**
+ * What retrieval actually needs from a store: its embedding identity and a top-k search. The
+ * in-memory store and the Postgres index both satisfy it, so `retrieve` doesn't care which one
+ * it was handed.
+ */
+export interface VectorIndex {
+  readonly provider: string;
+  readonly model: string;
+  readonly size: number;
+  search(queryVector: number[], k: number): Promise<SearchResult[]>;
+}
+
+export function inMemoryIndex(store: VectorStore): VectorIndex {
+  return {
+    provider: store.provider,
+    model: store.model,
+    size: store.entries.length,
+    async search(queryVector, k) {
+      return searchVectorStore(store, queryVector, k);
+    },
+  };
+}
+
+export function asVectorIndex(source: VectorStore | VectorIndex): VectorIndex {
+  return "entries" in source ? inMemoryIndex(source) : source;
+}
+
 export function saveVectorStore(store: VectorStore, filePath: string): void {
   writeFileSync(filePath, JSON.stringify(store));
 }
