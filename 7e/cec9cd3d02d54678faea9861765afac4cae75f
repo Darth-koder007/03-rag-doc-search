@@ -1,0 +1,53 @@
+.dockerignore
+  s_b8fd3a9d482bca::t_754e619a05fef2 1-7
+.github/workflows/ci.yml
+  s_b8fd3a9d482bca::t_34087fa7c12dc4 11-22,39-40,42
+Dockerfile
+  s_b8fd3a9d482bca::t_2c34a577abcee6 1-19
+README.md
+  s_b8fd3a9d482bca::t_dfb2fa0e5bd62d 128-159,162
+docker-compose.yml
+  s_b8fd3a9d482bca::t_411e5186c3e86f 2-32,45
+docs/design-http-service.md
+  s_b8fd3a9d482bca::t_8fc4e4dcba893e 1-45
+package.json
+  s_b8fd3a9d482bca::t_8cbb3bb069a7f6 22,24-25,31
+pnpm-lock.yaml
+  s_b8fd3a9d482bca::t_00bdfbd6b05255 14-16,20-25,36-38,407-412,599-601,1065-1068,1287-1320,1341-1356,1418-1421,1609-1612,1829-1832,1952-1957,2492-2493,2684-2718,2733-2742,2814-2815,2989-2990
+src/answer.ts
+  s_b8fd3a9d482bca::t_f75700683f3372 2,46
+src/api/api.integration.test.ts
+  s_b8fd3a9d482bca::t_8ee835f96e1a54 1-117
+src/api/app.test.ts
+  s_b8fd3a9d482bca::t_aa2826cf5617f7 1-150
+src/api/app.ts
+  s_b8fd3a9d482bca::t_78759f34c0d669 1-131
+src/api/server.ts
+  s_b8fd3a9d482bca::t_b1cb344cf9c6ae 1-40
+src/api/test-support.ts
+  s_b8fd3a9d482bca::t_ba4bb35442792e 1-42
+src/cli.ts
+  s_b8fd3a9d482bca::t_616b9677dca3b9 8-9,29-49
+src/retrieve.ts
+  s_b8fd3a9d482bca::t_7d33a76939e3b6 1,20,25,27-28,31,36
+src/store/pg-vector-index.ts
+  s_b8fd3a9d482bca::t_315867f831ccbe 1-124
+src/store/vector-store.ts
+  s_b8fd3a9d482bca::t_821b109f5e8900 66-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "7ecec9cd3d02d54678faea9861765afac4cae75f",
+  "prompts": {},
+  "sessions": {
+    "s_b8fd3a9d482bca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_b8fd3a9d482bca",
+        "model": "unknown"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
