@@ -1,0 +1,27 @@
+.github/workflows/ci.yml
+  s_e885086e7ad371::t_09a1e0cdfebd08 9-19
+.gitignore
+  s_e885086e7ad371::t_fb683af6f83325 7-15
+.gitleaksignore
+  s_e885086e7ad371::t_c9d5b72e5b38fe 1
+.husky/pre-commit
+  s_e885086e7ad371::t_7d0a258034b603 2-7
+README.md
+  s_e885086e7ad371::t_5370ced32bb4dc 139-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "93cdbbd5998c49b4294f78b257d54d983ef95d36",
+  "prompts": {},
+  "sessions": {
+    "s_e885086e7ad371": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "s_e885086e7ad371",
+        "model": "unknown"
+      },
+      "human_author": "Darth-koder007 <vj2010sn@gmail.com>"
+    }
+  }
+}
